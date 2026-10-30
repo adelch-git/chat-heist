@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#111510" />
+    <meta
+      name="description"
+      content="Your chat. One impossible heist. One chance to rewind time. A cooperative game for Twitch communities."
+    />
+    <title>Chat Heist — Your chat runs the mission.</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <a class="brand" href="./"
+        ><span class="brand-icon">↶</span> CHAT<span>HEIST</span
+        ><small>COMMUNITY OPERATIONS</small></a
+      >
+      <nav>
+        <span id="connection" class="badge">● PRACTICE MODE</span
+        ><button id="connect-open" class="quiet">Connect Twitch ↗</button
+        ><button id="screen" class="quiet">Stream view ⛶</button>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">A CO-OP HEIST. POWERED BY YOUR CHAT.</p>
+          <h1>Bad decisions.<br /><em>Great television.</em></h1>
+          <p class="subtitle">
+            Your audience is the crew. Their votes run the mission.<br />And
+            when it all goes wrong? Rewind together.
+          </p>
+        </div>
+        <div class="mission-tag">
+          <span>OPERATION 001</span><strong>THE CHRONO VAULT</strong
+          ><span>ORBITAL STATION · SECTOR 07</span>
+        </div>
+      </section>
+      <div class="stream-controls">
+        <button id="stream-start">Start / next ↗</button
+        ><button id="stream-pause">Pause / resume</button
+        ><button id="stream-lock">Lock votes</button
+        ><span>ENTER · P · L · R to rewind</span>
+      </div>
+      <div class="workspace">
+        <section class="game" aria-label="Heist game">
+          <div class="game-top">
+            <span
+              ><i class="dot"></i> <b id="phase-label">CREW ON STANDBY</b></span
+            ><span id="stage-label">ACT 01 / 03</span>
+          </div>
+          <div class="scene" id="scene">
+            <canvas
+              id="universe"
+              aria-label="Animated orbital vault and crew ship"
+            ></canvas>
+            <div class="scene-label">
+              <span>LIVE MISSION FEED</span
+              ><strong id="scene-name">THE APPROACH</strong>
+            </div>
+            <div class="coordinates">07° 42′ N<br />VELOCITY 28,440 KM/H</div>
+            <div id="outcome" class="outcome" hidden></div>
+            <div class="scene-bottom">
+              <div>
+                <small>CREW HAUL</small
+                ><strong id="loot">0<span> CR</span></strong>
+              </div>
+              <div class="heat">
+                <small>SECURITY HEAT <b id="heat-value">0%</b></small>
+                <div class="heat-track"><i id="heat-bar"></i><span></span></div>
+                <small>80% AT EXTRACTION = CAPTURE</small>
+              </div>
+            </div>
+          </div>
+          <div class="decision">
+            <div class="decision-heading">
+              <div>
+                <p class="eyebrow" id="round-label">THE FIRST MOVE</p>
+                <h2 id="round-title">One vault. Three ways in.</h2>
+              </div>
+              <div class="clock">
+                <strong id="timer">30</strong><small>SECONDS</small>
+              </div>
+            </div>
+            <p id="brief" class="muted"></p>
+            <div id="choices" class="choices"></div>
+            <div class="vote-footer">
+              <span id="vote-total">0 crew votes</span
+              ><span>One person, one vote · latest choice counts</span>
+            </div>
+          </div>
+          <div class="timeline">
+            <span class="eyebrow">THE TIMELINE</span>
+            <div id="timeline-nodes"></div>
+            <button id="rewind" class="rewind" disabled>
+              ↶ Rewind time <span>1 LEFT</span>
+            </button>
+          </div>
+        </section>
+        <aside>
+          <section class="panel controls">
+            <p class="eyebrow">MISSION CONTROL</p>
+            <h2>You're in command.</h2>
+            <p class="muted">
+              Give chat the wheel.<br />Keep your finger on the rewind.
+            </p>
+            <button id="start" class="primary">
+              Launch the heist <span>↗</span>
+            </button>
+            <div class="control-row">
+              <button id="pause" disabled>Pause</button
+              ><button id="resolve" disabled>Lock votes</button>
+            </div>
+            <p class="hint" id="control-hint">
+              Start a round, then choose a move below to rehearse.
+            </p>
+            <div class="divider"></div>
+            <div class="panel-title">
+              <strong>CREW COMMS</strong
+              ><span id="comms-mode">LOCAL REHEARSAL</span>
+            </div>
+            <div
+              id="log"
+              class="log"
+              role="log"
+              aria-label="Mission events"
+            ></div>
+            <div id="practice-controls">
+              <label for="practice-user">Rehearsal crew member</label
+              ><select id="practice-user">
+                <option value="pilot">Pilot</option>
+                <option value="hacker">Hacker</option>
+                <option value="lookout">Lookout</option>
+                <option value="driver">Driver</option>
+                <option value="rookie">Rookie</option></select
+              ><button id="practice-rewind" class="quiet">
+                Vote !rewind as this member
+              </button>
+              <p class="hint">
+                Click a move to vote as this crew member. No simulated live
+                viewers.
+              </p>
+            </div>
+          </section>
+          <section class="panel rewind-card">
+            <span class="rewind-icon">↶</span>
+            <p class="eyebrow">YOUR SECRET WEAPON</p>
+            <h2>The chat can<br />change history.</h2>
+            <p>
+              After a decision, type <code>!rewind</code>. A majority of the
+              last round's crew can undo it. One rewind. Make it count.
+            </p>
+            <p id="rewind-progress" class="hint">No rewind votes yet.</p>
+          </section>
+          <button id="reset" class="reset">
+            ↻ Reset rehearsal / start a new run
+          </button>
+        </aside>
+      </div>
+      <section class="how">
+        <div>
+          <span>01 / ASSEMBLE</span>
+          <h3>Bring your chat.</h3>
+          <p>
+            Connect your Twitch account. Viewers play directly in chat. No
+            downloads, no viewer signup.
+          </p>
+        </div>
+        <div>
+          <span>02 / COMMIT</span>
+          <h3>Choose your chaos.</h3>
+          <p>
+            Three rounds. Every move trades heat for loot. The biggest haul
+            means nothing if you get caught.
+          </p>
+        </div>
+        <div>
+          <span>03 / REWRITE</span>
+          <h3>Make the comeback.</h3>
+          <p>
+            One shared rewind turns the worst decision into the best moment of
+            the stream.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <span>CHAT HEIST <span class="muted">/ BUILT WITH CODEX</span></span
+      ><span>Small commands. Big consequences.</span
+      ><a
+        href="https://twitchcon-codex.devpost.com/"
+        target="_blank"
+        rel="noreferrer"
+        >CODEX × TWITCHCON 2026 ↗</a
+      >
+    </footer>
+    <dialog id="connect-dialog">
+      <form method="dialog">
+        <button class="dialog-close" aria-label="Close connection dialog">
+          ×
+        </button>
+      </form>
+      <p class="eyebrow">CONNECT YOUR CREW</p>
+      <h2>Bring Twitch into the heist.</h2>
+      <p>
+        Read your channel's chat using Twitch EventSub. No message sending or
+        moderation permissions.
+      </p>
+      <label for="client-id">Twitch application client ID</label
+      ><input id="client-id" autocomplete="off" spellcheck="false" /><button
+        id="authorize"
+        class="primary"
+      >
+        Authorize read-only chat ↗
+      </button>
+      <p class="hint">
+        Register a public client at dev.twitch.tv/console. Set its OAuth
+        redirect URL to <code id="redirect-url"></code>. Credentials remain in
+        memory; reconnect after reloading.
+      </p>
+      <details>
+        <summary>Connect with an existing user token</summary>
+        <label for="token">User access token (user:read:chat)</label
+        ><input id="token" type="password" autocomplete="off" /><button
+          id="connect-token"
+        >
+          Connect securely
+        </button>
+      </details>
+      <p id="connect-error" role="alert"></p>
+      <button id="disconnect" class="quiet">Disconnect Twitch</button>
+    </dialog>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
